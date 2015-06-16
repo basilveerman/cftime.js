@@ -70,37 +70,69 @@ describe('cftime', function() {
         it('Should parse 2000-05', function() {
             var cfd = cftime.parseDate('2000-05')
             expect(cfd.year).to.equal(2000);
-            expect(cfd.month).to.equal(5);
+            expect(cfd.month).to.equal(4);
         });
 
         it('Should parse 2000-05-15', function() {
-            var cfd = cftime.parseDate('2000-05-15')
+            var cfd = cftime.parseDate('2000-05-15');
             expect(cfd.year).to.equal(2000);
             expect(cfd.month).to.equal(4);
             expect(cfd.day).to.equal(15);
         });
 
-        // it('Should parse 2000-05-15T14:39:22', function() {
-        //     var d = new Date(2000, 4, 15, 14, 39, 22)
-        //     expect(cftime.parseDate('2000-05-15T14:39:22')).to.equalDate(d);
-        // });
+        it('Should parse 2000-05-15T14:39', function() {
+            var cfd = cftime.parseDate('2000-05-15T14:39');
+            expect(cfd.year).to.equal(2000);
+            expect(cfd.month).to.equal(4);
+            expect(cfd.day).to.equal(15);
+            expect(cfd.hour).to.equal(14);
+            expect(cfd.minute).to.equal(39);
+        });
 
-        // it('Should parse 2000-05-15 14:39:22', function() {
-        //     var d = new CFdate(2000, 4, 15, 14, 39, 22)
-        //     expect(cftime.parseDate('2000-05-15 14:39:22')).to.equalDate(d);
-        // });
+        it('Should parse 2000-05-15 14:39', function() {
+            var cfd = cftime.parseDate('2000-05-15 14:39');
+            expect(cfd.year).to.equal(2000);
+            expect(cfd.month).to.equal(4);
+            expect(cfd.day).to.equal(15);
+            expect(cfd.hour).to.equal(14);
+            expect(cfd.minute).to.equal(39);
+        });
 
+        it('Should parse 2000-05-15 14:39:52', function() {
+            var cfd = cftime.parseDate('2000-05-15 14:39:52');
+            expect(cfd.year).to.equal(2000);
+            expect(cfd.month).to.equal(4);
+            expect(cfd.day).to.equal(15);
+            expect(cfd.hour).to.equal(14);
+            expect(cfd.minute).to.equal(39);
+            expect(cfd.second).to.equal(52);
+        });
 
+        it('Should parse 2000-05-15 14:39:52.489', function() {
+            var cfd = cftime.parseDate('2000-05-15 14:39:52.489');
+            expect(cfd.year).to.equal(2000);
+            expect(cfd.month).to.equal(4);
+            expect(cfd.day).to.equal(15);
+            expect(cfd.hour).to.equal(14);
+            expect(cfd.minute).to.equal(39);
+            expect(cfd.second).to.equal(52);
+            expect(cfd.microsecond).to.equal(489);
+        });
 
-    })
-    var valid_dates = ['2009-05-19 14:39:22',
-                       '2009-05 14:39:22+0600',
-                       '2009T12:34',
-                       '1-7-15 0:0:0',
-                       '1-1-1 0:0:0',
-                       '0-0',
-                       '0000-0',
-                       '2000'
-                       ]
+        it('Should parse 0000-01', function() {
+            var cfd = cftime.parseDate('0000-01')
+            expect(cfd.year).to.equal(0);
+            expect(cfd.month).to.equal(0);
+        });
+
+        it('Should parse 1-7-15 0:0:0', function() {
+            var cfd = cftime.parseDate('1-7-15 0:0:0')
+            expect(cfd.year).to.equal(1);
+            expect(cfd.month).to.equal(6);
+            expect(cfd.day).to.equal(15);
+            expect(cfd.hour).to.equal(0);
+            expect(cfd.minute).to.equal(0);
+            expect(cfd.second).to.equal(0);
+        });
 
 });

@@ -71,14 +71,41 @@ var verifyCalendar = function(calendar) {
   return false;
 }
 
-// var ISO8601_REGEX = /(\d{1,4})(-(\d{1,2})(-(\d{1,2})(((.)(\d{1,2}):(\d{1,2})(:(\d{1,2})(\.(\d+))?)?)?((.?)(Z|(([-+])(\d{1,2}):(\d{1,2}))))?)?)?)?/g;
+/*
 
-var ISO8601_REGEX = /(\d{1,4})-(\d{1,2})-(\d{1,2})(?:(?: |T)(\d{1,2}):(\d{1,2})(:(\d{1,2})(\.(\d+))?)?)?/g;
+Date regex build as such:
+
+/^(\d{1,4})
+(?:
+    -(\d{1,2})
+    (?:
+        -(\d{1,2})
+    )?
+)?
+(?:
+    (?: |T)
+    (\d{1,2})
+    :
+    (\d{1,2})
+    (?::
+        (\d{1,2})
+        (?:\.(\d+))?
+    )?
+)?$
+/g;
+
+
+http://www.pelagodesign.com/blog/2009/05/20/iso-8601-date-validation-that-doesnt-suck/
+^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$
+
+*/
+
+var ISO8601_REGEX = /^(\d{1,4})(?:-(\d{1,2})(?:-(\d{1,2}))?)?(?:(?: |T)(\d{1,2}):(\d{1,2})(?::(\d{1,2})(?:\.(\d+))?)?)?$/;
 
 var parseDate = function(dateString) {
     var m = ISO8601_REGEX.exec(dateString);
     if (m) {
-        return new CFdate(parseInt(m[1]), parseInt(m[2]-1), parseInt(m[3]), parseInt(m[4]), parseInt(m[5]), parseInt(m[6]));
+        return new CFdate(parseInt(m[1]), parseInt(m[2]-1), parseInt(m[3]), parseInt(m[4]), parseInt(m[5]), parseInt(m[6]), parseInt(m[7]));
     } else {
         return false;
     }
