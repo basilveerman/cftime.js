@@ -1,0 +1,24 @@
+{
+  "name": "cftime.js",
+  "version": "0.0.1",
+  "description": "A Node.js and browser module to to interact with Climate and Forecast time metadata",
+  "main": "cftime.js",
+  "scripts": {
+    "test": "./node_modules/.bin/mocha --reporter spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/basilveerman/cftime.js.git"
+  },
+  "author": "Basil Veerman",
+  "license": "GPLv3",
+  "bugs": {
+    "url": "https://github.com/basilveerman/cftime.js/issues"
+  },
+  "homepage": "https://github.com/basilveerman/cftime.js",
+  "devDependencies": {
+    "chai": "^3.0.0",
+    "chai-datetime": "^1.4.0",
+    "mocha": "^2.2.5"
+  }
+}
