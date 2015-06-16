@@ -63,12 +63,12 @@ describe('cftime', function() {
         });
 
         it('Should parse 2000', function() {
-            var cfd = cftime.parseDate('2000')
+            var cfd = cftime.parseDate('2000');
             expect(cfd.year).to.equal(2000);
         });
 
         it('Should parse 2000-05', function() {
-            var cfd = cftime.parseDate('2000-05')
+            var cfd = cftime.parseDate('2000-05');
             expect(cfd.year).to.equal(2000);
             expect(cfd.month).to.equal(4);
         });
@@ -120,13 +120,13 @@ describe('cftime', function() {
         });
 
         it('Should parse 0000-01', function() {
-            var cfd = cftime.parseDate('0000-01')
+            var cfd = cftime.parseDate('0000-01');
             expect(cfd.year).to.equal(0);
             expect(cfd.month).to.equal(0);
         });
 
         it('Should parse 1-7-15 0:0:0', function() {
-            var cfd = cftime.parseDate('1-7-15 0:0:0')
+            var cfd = cftime.parseDate('1-7-15 0:0:0');
             expect(cfd.year).to.equal(1);
             expect(cfd.month).to.equal(6);
             expect(cfd.day).to.equal(15);
@@ -135,4 +135,9 @@ describe('cftime', function() {
             expect(cfd.second).to.equal(0);
         });
 
+        it('Should not parse 2001/7/15', function() {
+            var cfd = cftime.parseDate('2001/7/15');
+            expect(cfd).to.not.be.ok;
+        });
+    });
 });

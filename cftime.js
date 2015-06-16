@@ -38,14 +38,23 @@ cftime.prototype.toIndex = function(d) {
     }
 };
 
-var CFdate = function(year, month, day, hour, minute, second, microsecond) {
-    this.year = year
-    this.month = month
-    this.day = day
-    this.hour = hour
-    this.minute = minute
-    this.second = second
-    this.microsecond = microsecond
+var CFdate = function(year, month, day, hour, minute, second, millisecond) {
+    this.year = year;
+    this.month = month;
+    this.day = day;
+    this.hour = hour;
+    this.minute = minute;
+    this.second = second;
+    this.millisecond = millisecond;
+
+    this.getFullYear = function() { return this.year; }
+    this.getMonth = function() { return this.month; }
+    this.getDate = function() { return this.day; }
+    this.getHours = function() { return this.hour; }
+    this.getMinutes = function() { return this.minute; }
+    this.getSeconds = function() { return this.second; }
+    this.getMilliseconds = function() { return this.millisecond; }
+
 }
 
 
