@@ -202,6 +202,77 @@ var julianDayFromDate = function(date, calendar) {
     return jd;
 }
 
+var _NoLeapDayFromDate = function(date) {
+    /*
+    Creates a Julian Day for a calendar with no leap years from a CFdate object
+    Returns the fractional Julian Day (resolution approx 0.1 second).
+    */
+    var year = date.getFullYear();
+    var month = date.getMonth();
+    var day = date.getDate();
+
+    // Convert time to fractions of a day
+    day = day + date.getHours() / 24.0 + date.getMinutes() / 1440.0 + (date.getSeconds() + date.getMilliseconds()/1.e3) / 86400.0
+
+    if (month < 2) {
+        month = month + 12;
+        year = year - 1;
+    }
+    jd = int(365. * (year + 4716)) + int(30.6001 * (month + 1)) +  day - 1524.5;
+
+    return jd
+}
+
+var _AllLeapFromDate = function(date) {
+    /*
+    Creates a Julian Day for a calendar where all years have 366 days from
+    a CFdate object.
+    Returns the fractional Julian Day (resolution approx 0.1 second).
+    */
+
+    var year = date.getFullYear();
+    var month = date.getMonth();
+    var day = date.getDate();
+
+    // Convert time to fractions of a day
+    day = day + date.getHours() / 24.0 + date.getMinutes() / 1440.0 + (date.getSeconds() + date.getMilliseconds()/1.e3) / 86400.0
+
+    if (month < 2) {
+        month = month + 12;
+        year = year - 1;
+    }
+
+    jd = int(366. * (year + 4716)) + int(30.6001 * (month + 1)) + day - 1524.5
+
+    return jd
+
+}
+
+var _360DayFromDate = function(date) {
+    /*
+    Creates a Julian Day for a calendar where all months have 30 days from
+    a CFdate object.
+    Returns the fractional Julian Day (resolution approx 0.1 second).
+    */
+
+    var year = date.getFullYear();
+    var month = date.getMonth();
+    var day = date.getDate();
+
+    // Convert time to fractions of a day
+    day = day + date.getHours() / 24.0 + date.getMinutes() / 1440.0 + (date.getSeconds() + date.getMilliseconds()/1.e3) / 86400.0
+
+    if (month < 2) {
+        month = month + 12;
+        year = year - 1;
+    }
+
+    jd = int(360. * (year + 4716)) + int(30. * (month - 1)) + day
+
+    return jd
+
+}
+
 var date2num = function(date, units, calendar) {
     calendar = typeof calendar !== 'undefined' ?  calendar : 'standard';
 }
@@ -210,6 +281,9 @@ module.exports = {
     cftime: cftime,
     CFdate: CFdate,
     julianDayFromDate: julianDayFromDate,
+    _NoLeapDayFromDate: _NoLeapDayFromDate,
+    _AllLeapFromDate: _AllLeapFromDate,
+    _360DayFromDate: _360DayFromDate,
     parseDate: parseDate,
     parseUnits: parseUnits,
 }
