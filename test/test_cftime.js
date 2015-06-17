@@ -140,4 +140,20 @@ describe('cftime', function() {
             expect(cfd).to.not.be.ok;
         });
     });
+
+    describe('parseUnits', function() {
+
+        it('Should exist', function() {
+            expect(cftime.parseUnits).to.exist;
+        });
+
+        it('Should parse "days since 1-7-15 0:0:0"', function() {
+            var r = cftime.parseUnits('days since 1-7-15 0:0:0');
+            expect(r).to.have.keys('units', 'origin');
+            expect(r.units).to.equal('days');
+            expect(r.origin.year).to.equal(1);
+            expect(r.origin.month).to.equal(6);
+            expect(r.origin.day).to.equal(15);
+        });
+    });
 });

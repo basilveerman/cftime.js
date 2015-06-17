@@ -67,8 +67,16 @@ var microsecUnits = ['microseconds','microsecond', 'microsec', 'microsecs'],
   monthUnits =    ['month', 'months', 'mon', 'mons'],
   yearUnits =     ['year', 'years', 'yr', 'yrs']
 
-var units = microsecUnits.concat(millisecUnits,secUnits,
+var validUnits = microsecUnits.concat(millisecUnits,secUnits,
   minUnits,hrUnits,dayUnits,monthUnits,yearUnits);
+
+var unitsAreValid = function(unitString) {
+    if (validUnits.indexOf(unitString) >= 0) {
+        return true;
+    } else {
+        return false;
+    }
+}
 
 var calendars = ['standard', 'gregorian', 'proleptic_gregorian',
   'noleap', 'julian', 'all_leap', '365_day', '366_day', '360_day']
@@ -120,8 +128,36 @@ var parseDate = function(dateString) {
     }
 }
 
+var parseUnits = function(unitString) {
+    /*
+    Parse a string of the form "<time-units> since <date-string>"
+    Returns an object with keys 'units' and 'origin'
+    */
+
+    var split = unitString.split(' ');
+    var timeUnits = split[0].toLowerCase();
+    if (!unitsAreValid(timeUnits)) {
+        throw Error('Units must be one of ' + validUnits.join(' '));
+    }
+    if (split[1].toLowerCase() !== 'since') {
+        throw Error('No "since" in unit string');
+    }
+    var dateString = split.slice(2).join(' ');
+    var cfd = parseDate(dateString);
+
+    return {
+        units: timeUnits,
+        origin: cfd
+    }
+}
+
+var date2num = function(date, units, calendar) {
+    calendar = typeof calendar !== 'undefined' ?  calendar : 'standard';
+}
+
 module.exports = {
     cftime: cftime,
     CFdate: CFdate,
     parseDate: parseDate,
+    parseUnits: parseUnits,
 }
