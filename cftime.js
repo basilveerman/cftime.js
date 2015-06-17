@@ -151,6 +151,57 @@ var parseUnits = function(unitString) {
     }
 }
 
+var julianDayFromDate = function(date, calendar) {
+    /*
+    Based on https://github.com/Unidata/netcdf4-python/blob/master/netcdftime/netcdftime.py
+    */
+
+    calendar = typeof calendar !== 'undefined' ?  calendar : 'standard';
+
+    var year = date.getFullYear();
+    var month = date.getMonth();
+    var day = date.getDate();
+
+    // Convert time to fractions of a day
+    day = day + date.getHours() / 24.0 + date.getMinutes() / 1440.0 + (date.getSeconds() + date.getMilliseconds()/1.e3) / 86400.0
+
+    if (month < 2) {
+        month = month + 12;
+        year = year - 1;
+    }
+
+    var A = year / 100;
+
+    // jd = int(365.25 * (year + 4716)) + int(30.6001 * (month + 1)) + day - 1524.5
+    jd = 365. * year + parseInt(0.25 * year + 2000.) + parseInt(30.6001 * (month + 1)) + day + 1718994.5
+
+    // optionally adjust the jd for the switch from
+    // the Julian to Gregorian Calendar
+    // here assumed to have occurred the day after 1582 October 4
+
+    var B;
+
+    if (['standard', 'gregorian'].indexOf(calendar)) {
+        if (jd >= 2299160.5) {
+            B = 2 - A + parseInt(A/4);
+        } else if (jd < 2299160.5) {
+            B = 0;
+        } else {
+            throw Error('Impossible date (falls in gap between end of Julian calendar and beginning of Gregorian calendar');
+        }
+    } else if (calendar === 'proleptic_gregorian') {
+        B = 2 - A + parseInt(A/4);
+    } else if (calendar === 'gregorian') {
+        B = 0;
+    } else {
+        throw Error('unknown calendar, must be one of julian,standard,gregorian,proleptic_gregorian, got: ' + calendar);
+    }
+
+    jd = jd + B;
+
+    return jd;
+}
+
 var date2num = function(date, units, calendar) {
     calendar = typeof calendar !== 'undefined' ?  calendar : 'standard';
 }
@@ -158,6 +209,7 @@ var date2num = function(date, units, calendar) {
 module.exports = {
     cftime: cftime,
     CFdate: CFdate,
+    julianDayFromDate: julianDayFromDate,
     parseDate: parseDate,
     parseUnits: parseUnits,
 }
