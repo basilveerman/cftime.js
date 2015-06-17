@@ -116,7 +116,7 @@ describe('cftime', function() {
             expect(cfd.hour).to.equal(14);
             expect(cfd.minute).to.equal(39);
             expect(cfd.second).to.equal(52);
-            expect(cfd.microsecond).to.equal(489);
+            expect(cfd.millisecond).to.equal(489);
         });
 
         it('Should parse 0000-01', function() {
