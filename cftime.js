@@ -15,27 +15,92 @@ cftime.prototype.toDate = function(index) {
     if (index === undefined) {
         return this.sDate;
     }
-    if (this.units === "days") {
-        var d = new Date(this.sDate.getTime());
-        d.setDate(this.sDate.getDate() + index);
-        if (this.eDate && d > this.eDate) {
-            return undefined;
-        }
-        return d;
-    }
-};
+		var d = undefined;
+		switch(String(unitsMap[this.units])){
 
+			case "days":
+				d = new Date(this.sDate.getTime() + index*24*60*60*1000);
+				break;
+			case "hours":
+				d = new Date(this.sDate.getTime() + index*60*60*1000);
+				break;
+			case "minutes":
+				d = new Date(this.sDate.getTime() + index*60*1000);
+				break;
+			case "seconds":
+				d = new Date(this.sDate.getTime() + index*1000);
+				break;
+			case "milliseconds":
+				d = new Date(this.sDate.getTime() + index);
+				break;
+			case "microseconds":
+				d = new Date(this.sDate.getTime() + index/1000);
+				break;
+			case "months":
+				d = new Date(this.sDate.getTime());
+				d.setMonth(this.sDate.getMonth() + index);
+				break;
+			case "years":
+				d = new Date(this.sDate.getTime());
+				d.setYear(this.sDate.getYear() + index);
+				break;
+			}
+		if (d !== undefined && this.eDate && d > this.eDate) {
+				return undefined;
+		}
+		return d;
+};
+cftime.prototype.diffMonths = function(d){
+	var months = d.getMonth() - this.sDate.getMonth()
+			+(12 * (d.getFullYear() - this.sDate.getFullYear()));
+	if(d.getDate() < this.sDate.getDate()){
+		months--;
+	}
+	return months;
+}
 cftime.prototype.toIndex = function(d) {
     if (d < this.sDate || (this.eDate && this.eDate < d)) {
         return;
     }
-
-    if (this.units === "days") {
+		var units = unitsMap[this.units];
+    if (units === "days") {
         var msPerDay = 1000 * 60 * 60 * 24;
         var msDiff = d.getTime() - this.sDate.getTime();
         var days = msDiff / msPerDay;
         return Math.floor(days);
     }
+		if (units === "hours") {
+        var msPerHour = 1000 * 60 * 60;
+        var msDiff = d.getTime() - this.sDate.getTime();
+        var hours = msDiff / msPerHour;
+        return Math.floor(hours);
+    }
+		if (units === "minutes") {
+        var msPerMinute = 1000 * 60;
+        var msDiff = d.getTime() - this.sDate.getTime();
+        var minutes = msDiff / msPerMinute;
+        return Math.floor(minutes);
+    }
+		if (units === "seconds") {
+        var msPerSecond = 1000;
+        var msDiff = d.getTime() - this.sDate.getTime();
+        var seconds = msDiff / msPerSecond;
+        return Math.floor(seconds);
+    }
+		if (units === "milliseconds") {
+        var milliseconds = d.getTime() - this.sDate.getTime();
+        return Math.floor(milliseconds);
+    }
+		if (units === "microseconds") {
+        var microseconds = d.getTime() - this.sDate.getTime();
+        return Math.floor(microseconds*1000);
+    }
+		if (units === "months"){
+			return this.diffMonths(d);
+		}
+		if (units === "years"){
+			return Math.floor(this.diffMonths(d));
+		}
 };
 
 var CFdate = function(year, month, day, hour, minute, second, millisecond) {
@@ -60,22 +125,28 @@ var CFdate = function(year, month, day, hour, minute, second, millisecond) {
 
 var microsecUnits = ['microseconds','microsecond', 'microsec', 'microsecs'],
   millisecUnits = ['milliseconds', 'millisecond', 'millisec', 'millisecs'],
-  secUnits =      ['second', 'seconds', 'sec', 'secs', 's'],
-  minUnits =      ['minute', 'minutes', 'min', 'mins'],
-  hrUnits =       ['hour', 'hours', 'hr', 'hrs', 'h'],
-  dayUnits =      ['day', 'days', 'd'],
-  monthUnits =    ['month', 'months', 'mon', 'mons'],
-  yearUnits =     ['year', 'years', 'yr', 'yrs']
+  secUnits =      ['seconds', 'second', 'sec', 'secs', 's'],
+  minUnits =      ['minutes', 'minute', 'min', 'mins'],
+  hrUnits =       ['hours', 'hour', 'hr', 'hrs', 'h'],
+  dayUnits =      ['days', 'day', 'd'],
+  monthUnits =    ['months', 'month', 'mon', 'mons'],
+  yearUnits =     ['years', 'year', 'yr', 'yrs']
+var validUnits = [];
+var unitsMap = {};
+(function(units){
+	units.forEach(function(unit){
+		(function(key,variations){
+			variations.forEach(function(v){
+				validUnits.push(v);
+				unitsMap[v]=key
+			});
+		})(unit[0],unit);
+	})
+})([microsecUnits,millisecUnits,secUnits,minUnits,hrUnits,dayUnits,monthUnits,yearUnits]);
 
-var validUnits = microsecUnits.concat(millisecUnits,secUnits,
-  minUnits,hrUnits,dayUnits,monthUnits,yearUnits);
 
 var unitsAreValid = function(unitString) {
-    if (validUnits.indexOf(unitString) >= 0) {
-        return true;
-    } else {
-        return false;
-    }
+	return validUnits.indexOf(unitString) >= 0;
 }
 
 var calendars = ['standard', 'gregorian', 'proleptic_gregorian',
