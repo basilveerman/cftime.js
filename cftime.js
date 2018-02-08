@@ -1,8 +1,18 @@
 "use strict";
 
 var cftime = function(units, sDate) {
-    this.units = units;
+	if(arguments.length == 1){
+		var map = parseUnits(units);
+		if(map.origin.toDate){
+			this.units = map.units;
+			this.sDate = map.origin.toDate();
+		}else{
+			throw new Error("could not parse cftime from '"+units+"'");
+		}
+	}else{
+		this.units = units;
     this.sDate = sDate;
+	}
 };
 
 cftime.prototype.setMaxTimeByIndex = function(index) {
@@ -105,12 +115,12 @@ cftime.prototype.toIndex = function(d) {
 
 var CFdate = function(year, month, day, hour, minute, second, millisecond) {
     this.year = year;
-    this.month = month;
-    this.day = day;
-    this.hour = hour;
-    this.minute = minute;
-    this.second = second;
-    this.millisecond = millisecond;
+    this.month = month || 0;
+    this.day = day || 0;
+    this.hour = hour || 0;
+    this.minute = minute || 0;
+    this.second = second || 0;
+    this.millisecond = millisecond || 0;
 
     this.getFullYear = function() { return this.year; }
     this.getMonth = function() { return this.month; }
@@ -120,6 +130,17 @@ var CFdate = function(year, month, day, hour, minute, second, millisecond) {
     this.getSeconds = function() { return this.second; }
     this.getMilliseconds = function() { return this.millisecond; }
 
+}
+CFdate.prototype.toDate = function(){
+	var date = new Date("2000-01-01T00:00:00.000Z");
+	date.setYear(this.year);
+	date.setUTCMonth(this.month);
+	date.setUTCDate(this.day);
+	date.setUTCHours(this.hour);
+	date.setUTCMinutes(this.minute);
+	date.setUTCSeconds(this.second);
+	date.setUTCMilliseconds(this.millisecond);
+	return date;
 }
 
 

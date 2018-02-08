@@ -21,6 +21,12 @@ describe('cftime', function() {
         expect(t).to.exist;
     });
 
+		it('Should return a new cftime from "days since 1-7-15 8:0:0"',function(){
+			var t2 = new cftime.cftime("days since 1-7-15 8:0:0");
+			expect(t2).to.exist;
+			expect(t2.toDate().toUTCString()).to.equal(new Date('1901-07-15T08:00:00.000Z').toUTCString());
+		});
+
     describe('setMaxTimeByIndex()', function() {
 
         it('Should exist', function() {
