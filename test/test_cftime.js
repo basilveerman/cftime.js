@@ -213,5 +213,13 @@ describe('cftime', function() {
             expect(r.origin.month).to.equal(6);
             expect(r.origin.day).to.equal(15);
         });
+				it('Should parse "second since year 1968 month 05 day 23 at 00:00"', function(){
+					var r = cftime.parseUnits('second since year 1968 month 05 day 23 at 00:00');
+					expect(r).to.have.keys('units', 'origin');
+					expect(r.units).to.equal('second');
+					expect(r.origin.year).to.equal(1968);
+					expect(r.origin.month).to.equal(4);
+					expect(r.origin.day).to.equal(23);
+				})
     });
 });

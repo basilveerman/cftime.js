@@ -210,14 +210,17 @@ http://www.pelagodesign.com/blog/2009/05/20/iso-8601-date-validation-that-doesnt
 */
 
 var ISO8601_REGEX = /^(\d{1,4})(?:-(\d{1,2})(?:-(\d{1,2}))?)?(?:(?: |T)(\d{1,2}):(\d{1,2})(?::(\d{1,2})(?:\.(\d+))?)?)?$/;
-
+var YMD_REGEX = /year (\d{1,4}) month (\d{1,2}) day (\d{1,2}) at (\d{1,2}):(\d{1,2})/;
 var parseDate = function(dateString) {
     var m = ISO8601_REGEX.exec(dateString);
     if (m) {
         return new CFdate(parseInt(m[1]), parseInt(m[2]-1), parseInt(m[3]), parseInt(m[4]), parseInt(m[5]), parseInt(m[6]), parseInt(m[7]));
-    } else {
-        return false;
     }
+		m = YMD_REGEX.exec(dateString);
+		if (m) {
+        return new CFdate(parseInt(m[1]), parseInt(m[2]-1), parseInt(m[3]), parseInt(m[4]), parseInt(m[5]));
+    }
+    return false;
 }
 
 var parseUnits = function(unitString) {
