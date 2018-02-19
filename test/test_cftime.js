@@ -221,5 +221,14 @@ describe('cftime', function() {
 					expect(r.origin.month).to.equal(4);
 					expect(r.origin.day).to.equal(23);
 				})
+				it("should parse 'seconds since 1970-01-01T00:00:00Z'", function(){
+
+					var r = cftime.parseUnits('seconds since 1970-01-01T00:00:00Z');
+					expect(r).to.have.keys('units', 'origin');
+					expect(r.units).to.equal('seconds');
+					expect(r.origin.year).to.equal(1970);
+					expect(r.origin.month).to.equal(0);
+					expect(r.origin.day).to.equal(1);
+				})
     });
 });
