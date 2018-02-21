@@ -205,6 +205,14 @@ describe('cftime', function() {
             expect(r.origin.month).to.equal(6);
             expect(r.origin.day).to.equal(15);
         });
+				it('Should parse "seconds since 1-1-1970"', function() {
+            var r = cftime.parseUnits('seconds since 1-1-1970');
+            expect(r).to.have.keys('units', 'origin');
+            expect(r.units).to.equal('seconds');
+            expect(r.origin.year).to.equal(1970);
+            expect(r.origin.month).to.equal(0);
+            expect(r.origin.day).to.equal(1);
+        });
 				it('Should parse "minutes since 1-7-15 0:0:0"', function() {
             var r = cftime.parseUnits('minutes since 1-7-15 0:0:0');
             expect(r).to.have.keys('units', 'origin');
