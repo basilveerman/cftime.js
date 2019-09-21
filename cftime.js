@@ -1,8 +1,18 @@
 "use strict";
 
 var cftime = function(units, sDate) {
-    this.units = units;
+	if(arguments.length == 1){
+		var map = parseUnits(units);
+		if(map.origin.toDate){
+			this.units = map.units;
+			this.sDate = map.origin.toDate();
+		}else{
+			throw new Error("could not parse cftime from '"+units+"'");
+		}
+	}else{
+		this.units = units;
     this.sDate = sDate;
+	}
 };
 
 cftime.prototype.setMaxTimeByIndex = function(index) {
@@ -15,37 +25,102 @@ cftime.prototype.toDate = function(index) {
     if (index === undefined) {
         return this.sDate;
     }
-    if (this.units === "days") {
-        var d = new Date(this.sDate.getTime());
-        d.setDate(this.sDate.getDate() + index);
-        if (this.eDate && d > this.eDate) {
-            return undefined;
-        }
-        return d;
-    }
-};
+		var d = undefined;
+		switch(String(unitsMap[this.units])){
 
+			case "days":
+				d = new Date(this.sDate.getTime() + index*24*60*60*1000);
+				break;
+			case "hours":
+				d = new Date(this.sDate.getTime() + index*60*60*1000);
+				break;
+			case "minutes":
+				d = new Date(this.sDate.getTime() + index*60*1000);
+				break;
+			case "seconds":
+				d = new Date(this.sDate.getTime() + index*1000);
+				break;
+			case "milliseconds":
+				d = new Date(this.sDate.getTime() + index);
+				break;
+			case "microseconds":
+				d = new Date(this.sDate.getTime() + index/1000);
+				break;
+			case "months":
+				d = new Date(this.sDate.getTime());
+				d.setMonth(this.sDate.getMonth() + index);
+				break;
+			case "years":
+				d = new Date(this.sDate.getTime());
+				d.setYear(this.sDate.getYear() + index);
+				break;
+			}
+		if (d !== undefined && this.eDate && d > this.eDate) {
+				return undefined;
+		}
+		return d;
+};
+cftime.prototype.diffMonths = function(d){
+	var months = d.getMonth() - this.sDate.getMonth()
+			+(12 * (d.getFullYear() - this.sDate.getFullYear()));
+	if(d.getDate() < this.sDate.getDate()){
+		months--;
+	}
+	return months;
+}
 cftime.prototype.toIndex = function(d) {
     if (d < this.sDate || (this.eDate && this.eDate < d)) {
         return;
     }
-
-    if (this.units === "days") {
+		var units = unitsMap[this.units];
+    if (units === "days") {
         var msPerDay = 1000 * 60 * 60 * 24;
         var msDiff = d.getTime() - this.sDate.getTime();
         var days = msDiff / msPerDay;
         return Math.floor(days);
     }
+		if (units === "hours") {
+        var msPerHour = 1000 * 60 * 60;
+        var msDiff = d.getTime() - this.sDate.getTime();
+        var hours = msDiff / msPerHour;
+        return Math.floor(hours);
+    }
+		if (units === "minutes") {
+        var msPerMinute = 1000 * 60;
+        var msDiff = d.getTime() - this.sDate.getTime();
+        var minutes = msDiff / msPerMinute;
+        return Math.floor(minutes);
+    }
+		if (units === "seconds") {
+        var msPerSecond = 1000;
+        var msDiff = d.getTime() - this.sDate.getTime();
+        var seconds = msDiff / msPerSecond;
+        return Math.floor(seconds);
+    }
+		if (units === "milliseconds") {
+        var milliseconds = d.getTime() - this.sDate.getTime();
+        return Math.floor(milliseconds);
+    }
+		if (units === "microseconds") {
+        var microseconds = d.getTime() - this.sDate.getTime();
+        return Math.floor(microseconds*1000);
+    }
+		if (units === "months"){
+			return this.diffMonths(d);
+		}
+		if (units === "years"){
+			return Math.floor(this.diffMonths(d));
+		}
 };
 
 var CFdate = function(year, month, day, hour, minute, second, millisecond) {
     this.year = year;
-    this.month = month;
-    this.day = day;
-    this.hour = hour;
-    this.minute = minute;
-    this.second = second;
-    this.millisecond = millisecond;
+    this.month = month || 0;
+    this.day = day || 0;
+    this.hour = hour || 0;
+    this.minute = minute || 0;
+    this.second = second || 0;
+    this.millisecond = millisecond || 0;
 
     this.getFullYear = function() { return this.year; }
     this.getMonth = function() { return this.month; }
@@ -56,26 +131,43 @@ var CFdate = function(year, month, day, hour, minute, second, millisecond) {
     this.getMilliseconds = function() { return this.millisecond; }
 
 }
+CFdate.prototype.toDate = function(){
+	var date = new Date("2000-01-01T00:00:00.000Z");
+	date.setYear(this.year);
+	date.setUTCMonth(this.month);
+	date.setUTCDate(this.day);
+	date.setUTCHours(this.hour);
+	date.setUTCMinutes(this.minute);
+	date.setUTCSeconds(this.second);
+	date.setUTCMilliseconds(this.millisecond);
+	return date;
+}
 
 
 var microsecUnits = ['microseconds','microsecond', 'microsec', 'microsecs'],
   millisecUnits = ['milliseconds', 'millisecond', 'millisec', 'millisecs'],
-  secUnits =      ['second', 'seconds', 'sec', 'secs', 's'],
-  minUnits =      ['minute', 'minutes', 'min', 'mins'],
-  hrUnits =       ['hour', 'hours', 'hr', 'hrs', 'h'],
-  dayUnits =      ['day', 'days', 'd'],
-  monthUnits =    ['month', 'months', 'mon', 'mons'],
-  yearUnits =     ['year', 'years', 'yr', 'yrs']
+  secUnits =      ['seconds', 'second', 'sec', 'secs', 's'],
+  minUnits =      ['minutes', 'minute', 'min', 'mins'],
+  hrUnits =       ['hours', 'hour', 'hr', 'hrs', 'h'],
+  dayUnits =      ['days', 'day', 'd'],
+  monthUnits =    ['months', 'month', 'mon', 'mons'],
+  yearUnits =     ['years', 'year', 'yr', 'yrs']
+var validUnits = [];
+var unitsMap = {};
+(function(units){
+	units.forEach(function(unit){
+		(function(key,variations){
+			variations.forEach(function(v){
+				validUnits.push(v);
+				unitsMap[v]=key
+			});
+		})(unit[0],unit);
+	})
+})([microsecUnits,millisecUnits,secUnits,minUnits,hrUnits,dayUnits,monthUnits,yearUnits]);
 
-var validUnits = microsecUnits.concat(millisecUnits,secUnits,
-  minUnits,hrUnits,dayUnits,monthUnits,yearUnits);
 
 var unitsAreValid = function(unitString) {
-    if (validUnits.indexOf(unitString) >= 0) {
-        return true;
-    } else {
-        return false;
-    }
+	return validUnits.indexOf(unitString) >= 0;
 }
 
 var calendars = ['standard', 'gregorian', 'proleptic_gregorian',
@@ -117,15 +209,23 @@ http://www.pelagodesign.com/blog/2009/05/20/iso-8601-date-validation-that-doesnt
 
 */
 
-var ISO8601_REGEX = /^(\d{1,4})(?:-(\d{1,2})(?:-(\d{1,2}))?)?(?:(?: |T)(\d{1,2}):(\d{1,2})(?::(\d{1,2})(?:\.(\d+))?)?)?$/;
-
+var ISO8601_REGEX = /^(\d{1,4})(?:-(\d{1,2})(?:-(\d{1,2}))?)?(?:(?: |T)(\d{1,2}):(\d{1,2})(?::(\d{1,2})(?:\.(\d+))?)?)?(Z)?$/;
+var YMD_REGEX = /year (\d{1,4}) month (\d{1,2}) day (\d{1,2}) at (\d{1,2}):(\d{1,2})/;
+var DMYYYY_REGEX = /(\d{1,2})-(\d{1,2})-(\d{4})/;
 var parseDate = function(dateString) {
     var m = ISO8601_REGEX.exec(dateString);
     if (m) {
         return new CFdate(parseInt(m[1]), parseInt(m[2]-1), parseInt(m[3]), parseInt(m[4]), parseInt(m[5]), parseInt(m[6]), parseInt(m[7]));
-    } else {
-        return false;
     }
+		m = YMD_REGEX.exec(dateString);
+		if (m) {
+        return new CFdate(parseInt(m[1]), parseInt(m[2]-1), parseInt(m[3]), parseInt(m[4]), parseInt(m[5]));
+    }
+		m = DMYYYY_REGEX.exec(dateString);
+		if (m) {
+        return new CFdate(parseInt(m[3]), parseInt(m[2]-1), parseInt(m[1]), 0, 0);
+    }
+    return false;
 }
 
 var parseUnits = function(unitString) {

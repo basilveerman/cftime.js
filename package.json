@@ -1,6 +1,6 @@
 {
   "name": "cftime.js",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A Node.js and browser module to to interact with Climate and Forecast time metadata",
   "main": "cftime.js",
   "scripts": {
